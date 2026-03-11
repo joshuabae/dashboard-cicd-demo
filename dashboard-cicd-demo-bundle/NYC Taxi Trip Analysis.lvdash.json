@@ -8,18 +8,711 @@
         "  *\n",
         "FROM\n",
         "  samples.nyctaxi.trips"
+      ],
+      "columns": [
+        {
+          "displayName": "Pickup Date",
+          "description": "Pickup datetime truncated to day for daily trends",
+          "expression": "DATE_TRUNC('day', `tpep_pickup_datetime`)"
+        },
+        {
+          "displayName": "Pickup Hour",
+          "description": "Hour of day (0-23) for hourly activity patterns",
+          "expression": "HOUR(`tpep_pickup_datetime`)"
+        },
+        {
+          "displayName": "Day of Week",
+          "description": "Day name for weekly patterns",
+          "expression": "DATE_FORMAT(`tpep_pickup_datetime`, 'EEEE')"
+        },
+        {
+          "displayName": "Trip Duration (min)",
+          "description": "Trip duration in minutes",
+          "expression": "ROUND((UNIX_TIMESTAMP(`tpep_dropoff_datetime`) - UNIX_TIMESTAMP(`tpep_pickup_datetime`)) / 60, 1)"
+        },
+        {
+          "displayName": "Cost per Mile",
+          "description": "Fare per mile traveled",
+          "expression": "CASE WHEN `trip_distance` > 0 THEN ROUND(`fare_amount` / `trip_distance`, 2) ELSE NULL END"
+        },
+        {
+          "displayName": "Distance Bin (mi)",
+          "description": "Trip distance rounded to nearest mile for charting",
+          "expression": "ROUND(`trip_distance`, 0)"
+        }
       ]
     }
   ],
   "pages": [
     {
       "name": "24496f99",
-      "displayName": "Untitled page",
-      "pageType": "PAGE_TYPE_CANVAS"
+      "displayName": "Trip Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "total_trips",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Total Trips",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)",
+                  "displayName": "Total Trips"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_fare",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "avg(fare_amount)",
+                      "expression": "AVG(`fare_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Average Fare",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(fare_amount)",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    },
+                    "abbreviation": "none"
+                  },
+                  "displayName": "Average Fare"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_distance",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "avg(trip_distance)",
+                      "expression": "AVG(`trip_distance`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Avg Distance (mi)",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(trip_distance)",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    },
+                    "abbreviation": "none"
+                  },
+                  "displayName": "Avg Distance"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "avg_duration",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "avg(Trip Duration (min))",
+                      "expression": "AVG(`Trip Duration (min)`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Avg Duration (min)",
+                "showTitle": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(Trip Duration (min))",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 1
+                    },
+                    "abbreviation": "none"
+                  },
+                  "displayName": "Avg Duration"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "daily_trips",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "Pickup Date",
+                      "expression": "`Pickup Date`"
+                    },
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Daily Trip Volume",
+                "showTitle": true
+              },
+              "widgetType": "area",
+              "encodings": {
+                "x": {
+                  "fieldName": "Pickup Date",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "displayName": "Pickup Date",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(*)",
+                  "displayName": "Trip Count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "hourly_trips",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "Pickup Hour",
+                      "expression": "`Pickup Hour`"
+                    },
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Trips by Hour of Day",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Pickup Hour",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "displayName": "Pickup Hour",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(*)",
+                  "displayName": "Trip Count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 4,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "cost_vs_distance",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "Distance Bin (mi)",
+                      "expression": "`Distance Bin (mi)`"
+                    },
+                    {
+                      "name": "avg(fare_amount)",
+                      "expression": "AVG(`fare_amount`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`trip_distance`, 1, 30)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Average Fare by Trip Distance",
+                "showTitle": true
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "Distance Bin (mi)",
+                  "displayName": "Distance (mi)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(fare_amount)",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    },
+                    "abbreviation": "none"
+                  },
+                  "displayName": "Avg Fare",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "top_pickup_zips",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "pickup_zip",
+                      "expression": "`pickup_zip`"
+                    },
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Top 10 Pickup Zip Codes",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "pickup_zip",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "displayName": "Pickup Zip",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(*)",
+                  "displayName": "Trip Count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "fare_by_day",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "Day of Week",
+                      "expression": "`Day of Week`"
+                    },
+                    {
+                      "name": "avg(fare_amount)",
+                      "expression": "AVG(`fare_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Average Fare by Day of Week",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Day of Week",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "displayName": "Day of Week",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "custom-order",
+                      "orderedValues": [
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                        "Sunday"
+                      ]
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(fare_amount)",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    },
+                    "abbreviation": "none"
+                  },
+                  "displayName": "Avg Fare",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 14,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "filter_date_range",
+            "queries": [
+              {
+                "name": "dashboards/01f11d979c2f125f9d6af350de51954c/datasets/01f11d979c2f134393bb91bfd613485e_Pickup Date",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "Pickup Date",
+                      "expression": "`Pickup Date`"
+                    },
+                    {
+                      "name": "Pickup Date_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Pickup Date Range",
+                "showTitle": true
+              },
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "Pickup Date",
+                    "queryName": "dashboards/01f11d979c2f125f9d6af350de51954c/datasets/01f11d979c2f134393bb91bfd613485e_Pickup Date"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter_pickup_zip",
+            "queries": [
+              {
+                "name": "dashboards/01f11d979c2f125f9d6af350de51954c/datasets/01f11d979c2f134393bb91bfd613485e_pickup_zip",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "pickup_zip",
+                      "expression": "`pickup_zip`"
+                    },
+                    {
+                      "name": "pickup_zip_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Pickup Zip Code",
+                "showTitle": true
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "pickup_zip",
+                    "queryName": "dashboards/01f11d979c2f125f9d6af350de51954c/datasets/01f11d979c2f134393bb91bfd613485e_pickup_zip"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter_dropoff_zip",
+            "queries": [
+              {
+                "name": "dashboards/01f11d979c2f125f9d6af350de51954c/datasets/01f11d979c2f134393bb91bfd613485e_dropoff_zip",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "dropoff_zip",
+                      "expression": "`dropoff_zip`"
+                    },
+                    {
+                      "name": "dropoff_zip_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Dropoff Zip Code",
+                "showTitle": true
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "dropoff_zip",
+                    "queryName": "dashboards/01f11d979c2f125f9d6af350de51954c/datasets/01f11d979c2f134393bb91bfd613485e_dropoff_zip"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
     }
   ],
   "uiSettings": {
     "theme": {
+      "visualizationColors": [
+        "#1B6B93",
+        "#F4A261",
+        "#2A9D8F",
+        "#E76F51",
+        "#264653",
+        "#E9C46A",
+        "#606C38",
+        "#BC6C25",
+        "#457B9D",
+        "#A8DADC"
+      ],
       "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
     },
     "applyModeEnabled": false
