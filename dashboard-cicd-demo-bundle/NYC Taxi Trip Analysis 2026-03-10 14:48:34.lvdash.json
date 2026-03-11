@@ -1,0 +1,27 @@
+{
+  "datasets": [
+    {
+      "name": "d344d426",
+      "displayName": "NYC Taxi Trips",
+      "queryLines": [
+        "SELECT\n",
+        "  *\n",
+        "FROM\n",
+        "  samples.nyctaxi.trips"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "24496f99",
+      "displayName": "Untitled page",
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
