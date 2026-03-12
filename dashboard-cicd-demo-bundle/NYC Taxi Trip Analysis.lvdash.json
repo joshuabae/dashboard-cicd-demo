@@ -39,6 +39,11 @@
           "displayName": "Distance Bin (mi)",
           "description": "Trip distance rounded to nearest mile for charting",
           "expression": "ROUND(`trip_distance`, 0)"
+        },
+        {
+          "displayName": "Hour Block",
+          "description": "Pickup hour grouped into 4-hour blocks",
+          "expression": "CASE WHEN HOUR(`tpep_pickup_datetime`) < 4 THEN '12am–4am' WHEN HOUR(`tpep_pickup_datetime`) < 8 THEN '4am–8am' WHEN HOUR(`tpep_pickup_datetime`) < 12 THEN '8am–12pm' WHEN HOUR(`tpep_pickup_datetime`) < 16 THEN '12pm–4pm' WHEN HOUR(`tpep_pickup_datetime`) < 20 THEN '4pm–8pm' ELSE '8pm–12am' END"
         }
       ]
     }
@@ -692,6 +697,74 @@
             "y": 0,
             "width": 4,
             "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "heatmap_hour_day",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d344d426",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    },
+                    {
+                      "name": "Day of Week",
+                      "expression": "`Day of Week`"
+                    },
+                    {
+                      "name": "Hour Block",
+                      "expression": "`Hour Block`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Trip Demand Heatmap: Hour vs Day of Week",
+                "showTitle": true
+              },
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "Day of Week",
+                  "displayName": "Day of Week",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "Hour Block",
+                  "displayName": "Hour Block",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "color": {
+                  "fieldName": "count(*)",
+                  "displayName": "Trip Count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 19,
+            "width": 12,
+            "height": 5
           }
         }
       ],
