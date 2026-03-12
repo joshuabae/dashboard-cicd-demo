@@ -8,8 +8,7 @@ include:
 
 variables:
   warehouse_id:
-    lookup:
-      warehouse: Shared Unity Catalog Serverless
+    default: "4b9b953939869799"
 
 targets:
   # The 'dev' target, for development purposes. This target is the default.
@@ -23,13 +22,15 @@ targets:
   prod:
     mode: production
     workspace:
-      host: https://e2-demo-field-eng.cloud.databricks.com
+      host: https://e2-demo-west.cloud.databricks.com
       # We always use /Users/josh.bae@databricks.com for all resources to make sure we only have a single copy.
       root_path: /Users/josh.bae@databricks.com/.bundle/${bundle.name}/${bundle.target}
     run_as:
       # This runs as josh.bae@databricks.com in production. We could also use a service principal here,
       # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
       user_name: josh.bae@databricks.com
+    variables:
+      warehouse_id: "75fd8278393d07eb"
 
 resources:
   dashboards:
